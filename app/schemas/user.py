@@ -25,3 +25,15 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+from typing import Optional
+from enum import Enum
+
+class UserRole(str, Enum):
+    ADMIN = "ADMIN"
+    USER = "USER"
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    role: Optional[UserRole] = None
+    is_active: Optional[bool] = None

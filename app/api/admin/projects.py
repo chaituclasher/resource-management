@@ -28,3 +28,38 @@ def create_project(payload: ProjectCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(project)
     return project
+from uuid import UUID
+from fastapi import HTTPException
+
+@router.put("/{project_id}", response_model=ProjectResponse)
+def update_project(
+    project_id: UUID,
+    payload: ProjectCreate,
+    db: Session = Depends(get_db)
+):
+    project = db.query(Project).filter(Project.id == project_id).first()
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    project.code = payload.code
+    project.name = payload.name
+    project.is_active = payload.is_active
+
+    db.commit()
+    db.refresh(project)
+    return project
+@router.delete("/{project_id}")
+def deactivate_project(
+    project_id: UUID,
+    db: Session = Depends(get_db)
+):
+    project = db.query(Project).filter(Project.id == project_id).first()
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    project.is_active = False
+    db.commit()
+
+    return {"message": "Project deactivated successfully"}
